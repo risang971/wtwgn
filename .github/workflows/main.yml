@@ -1,0 +1,31 @@
+name: Visit website using Firefox
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "Enter the URL of the website to visit"
+        required: true
+
+jobs:
+  visit-website:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        instance: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+    steps:
+    - name: Install python dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3-pip
+        pip3 install fake_useragent
+    - name: Use Firefox web driver to visit website
+      env:
+        DISPLAY: :99.0
+        MOZ_HEADLESS: 1
+      run: |
+        sudo apt-get install -y firefox xvfb
+        Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        echo 'Starting Firefox ...'
+        /usr/bin/firefox --version
+        /usr/bin/firefox --headless --no-remote --marionette --setDefaultBrowser --user-agent "$(python3 -c 'from fake_useragent import UserAgent; print(UserAgent().random)')" ${{ inputs.url }}
